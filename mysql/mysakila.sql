@@ -90,7 +90,7 @@ UPDATE customer2
 SET age = 15
 WHERE email = 'bolu@gmail.com';
 
-SELECT * FROM customer2;
+SELECT * FROM customer_audit;
 
 DELIMITER //
 CREATE TRIGGER after_insert
@@ -99,9 +99,10 @@ FOR EACH ROW
 BEGIN 
     IF NEW.grade = 'F' THEN
     INSERT INTO customer_audit(customer_id, action, added_date)
-    VALUES(NEW.customer_id, "poor", CURRENT_TIMESTAMP());
+    VALUES(NEW.customer_id, 'poor', CURRENT_TIMESTAMP());
     END IF;
 END //
 
-INSERT INTO customer2(email, full_name, date_co, age)
-VALUES('tobby@gmail.com', 'bami bello', CURRENT_DATE, 10);
+INSERT INTO customer2(email, full_name, date_co, age, grade)
+VALUES('tobby@gmail.com', 'bami bello', CURRENT_DATE, 10, 'F');
+
