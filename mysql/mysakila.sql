@@ -41,6 +41,7 @@ CREATE TABLE cus_del_table(
     del_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+# TRIGGERS
 DELIMITER //
 CREATE TRIGGER soft_delete
 AFTER DELETE ON customer2
@@ -103,6 +104,72 @@ BEGIN
     END IF;
 END //
 
-INSERT INTO customer2(email, full_name, date_co, age, grade)
-VALUES('tobby@gmail.com', 'bami bello', CURRENT_DATE, 10, 'F');
+
+INSERT INTO customer2(email, full_name, date_co, age)
+VALUES('dolypy@gmail.com', 'dolapo oke', CURRENT_DATE, 74);
+
+DELIMITER //
+CREATE TRIGGER before_insert
+BEFORE INSERT ON customer2
+FOR EACH ROW
+BEGIN
+    IF  NEW.age < 0 THEN
+        SET NEW.age = NEW.age * -1;
+        ELSEIF NEW.age >50 THEN
+        SET NEW.age = 50;
+    END IF;
+END //
+DELIMITER ; 
+
+
+
+# PROCEDURE
+# STORED PROCEDURE THAT GENERATE TOP 10 BEST RATING ACTOR
+DELIMITER //
+CREATE PROCEDURE top_actor()
+BEGIN
+    SELECT CONCAT(a.first_name, ' ' ,a.last_name) AS `full_name`, AVG(f.rental_rate) AS `rate_score`
+    FROM actor a
+    JOIN film_actor fa ON a.actor_id = fa.actor_id 
+    JOIN film f ON fa.film_id = f.film_id   
+    GROUP BY full_name   
+    ORDER BY rate_score DESC
+    LIMIT 10;   
+END //
+DELIMITER ;
+call top_actor();
+
+# STORED PROCEDURE THAT GENERATE TOP 10 BEST MOVIES USING (IN argument)
+DELIMITER //
+CREATE PROCEDURE top_film(IN num INT)
+BEGIN   
+    SELECT title AS `movie`,  AVG(rental_rate) AS `rate_score`
+    FROM film
+    GROUP BY `movie`  
+    ORDER BY `rate_score` DESC
+    LIMIT num;
+END //
+call top_film(5);
+DROP PROCEDURE IF EXISTS rate_film;
+
+# STORED PROCEDURE THAT GENERATE TOP 10 BEST MOVIES USING (IN and OUT argument and ALIAS)
+DELIMITER //
+CREATE PROCEDURE rate_film(IN num INT, OUT total_rate DECIMAL(5,2))
+BEGIN   
+    SELECT AVG(rental_rate) INTO `total_rate`
+    FROM 
+        (SELECT rental_rate 
+        FROM film 
+        ORDER BY rental_rate DESC
+        LIMIT num
+        ) AS top_rated;
+END //
+DELIMITER ;
+CALL rate_film(109, @sumrate);
+SELECT @sumrate
+
+
+# CREATE A VIEWS
+
+
 
