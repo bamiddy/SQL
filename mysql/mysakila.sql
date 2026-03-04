@@ -168,8 +168,30 @@ DELIMITER ;
 CALL rate_film(109, @sumrate);
 SELECT @sumrate
 
+# CREATE A VIEWS FOR SOFT DELETE. USING 0 AND 1
+ALTER TABLE customer2
+ADD COLUMN 
+`deleted` INT DEFAULT 0;
 
-# CREATE A VIEWS
+CREATE VIEW customer_view
+AS 
+SELECT `customer_id`, `email`, `full_name`, `age`, `date_co`
+FROM customer2
+WHERE deleted = 0;
 
+
+SELECT * FROM customer_view;
+
+DELETE FROM customer_view
+WHERE age = 15;
+
+INSERT INTO customer_view(email, full_name, age, date_co)
+VALUES('esther@gmail.com', 'Esther Ajala', 22, '1999-08-20');
+
+
+## TRIGGER FROM DELETION AND INSERTION INTO THE VIEW TABLE.
+## In mysql and psql you can modify view, but you cannot do it in mysqlite.
+
+CREATED
 
 
